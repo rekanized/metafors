@@ -1,0 +1,41 @@
+<svg width="520" height="140" viewBox="0 0 520 140" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="logoTitle logoDesc">
+  <title id="logoTitle">Metafors logo</title>
+  <desc id="logoDesc">A warm cloud mark beside the Metafors wordmark.</desc>
+  <defs>
+    <linearGradient id="panelGlow" x1="18" y1="14" x2="126" y2="126" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF8F2"/>
+      <stop offset="1" stop-color="#F6E0D3"/>
+    </linearGradient>
+    <linearGradient id="cloudFill" x1="30" y1="33" x2="119" y2="100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E97D4A"/>
+      <stop offset="1" stop-color="#4AA79B"/>
+    </linearGradient>
+    <linearGradient id="quoteFill" x1="57" y1="51" x2="89" y2="90" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7EF"/>
+      <stop offset="1" stop-color="#FFE1CF"/>
+    </linearGradient>
+    <filter id="shadow" x="0" y="0" width="170" height="160" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="10"/>
+      <feGaussianBlur stdDeviation="12"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.121569 0 0 0 0 0.160784 0 0 0 0 0.2 0 0 0 0.16 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <rect x="14" y="14" width="112" height="112" rx="28" fill="url(#panelGlow)"/>
+    <path d="M95.4537 97H53.9488C43.9472 97 35.6758 89.1814 35.6758 79.6194C35.6758 71.1615 42.1833 64.2178 50.6179 62.9225C53.1132 52.113 63.0439 44.3636 74.6768 44.3636C84.3869 44.3636 92.8403 49.7698 97.0725 57.6736C98.6096 57.3175 100.221 57.1277 101.88 57.1277C113.182 57.1277 122.344 65.8463 122.344 76.6C122.344 87.909 110.428 97 95.4537 97Z" fill="url(#cloudFill)"/>
+    <path d="M60.9319 72.8477C60.9319 68.2726 63.968 64.95 68.5554 64.95C69.7308 64.95 70.8124 65.1375 71.8001 65.5125L69.0507 75.7602C67.9464 75.5021 67.1 75.3731 66.5116 75.3731C65.028 75.3731 64.2862 76.2795 64.2862 78.0922C64.2862 79.8692 65.028 80.7577 66.5116 80.7577C66.9941 80.7577 67.6537 80.6404 68.4905 80.4059L67.0759 85.6672C66.5934 85.7844 66.111 85.8431 65.6285 85.8431C62.4974 85.8431 60.9319 83.7091 60.9319 79.4413V72.8477ZM76.6547 72.8477C76.6547 68.2726 79.6908 64.95 84.2781 64.95C85.4535 64.95 86.5351 65.1375 87.5229 65.5125L84.7734 75.7602C83.6692 75.5021 82.8228 75.3731 82.2344 75.3731C80.7508 75.3731 80.009 76.2795 80.009 78.0922C80.009 79.8692 80.7508 80.7577 82.2344 80.7577C82.7168 80.7577 83.3765 80.6404 84.2133 80.4059L82.7987 85.6672C82.3162 85.7844 81.8337 85.8431 81.3513 85.8431C78.2202 85.8431 76.6547 83.7091 76.6547 79.4413V72.8477Z" fill="url(#quoteFill)"/>
+    <circle cx="100.5" cy="42.5" r="6" fill="#F6C14C"/>
+    <path d="M101.597 32.8594L104.343 25.5" stroke="#8D3D1F" stroke-width="3" stroke-linecap="round"/>
+    <path d="M110.584 42.0769L117.716 39.377" stroke="#8D3D1F" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(152 18)">
+    <text x="0" y="56" fill="#1F2933" font-size="56" font-weight="700" font-family="Georgia, 'Times New Roman', serif" letter-spacing="-1.4">Metafors</text>
+    <text x="2" y="88" fill="#8D3D1F" font-size="14" font-weight="700" font-family="'Trebuchet MS', 'Segoe UI', sans-serif" letter-spacing="3.2">SOFTWARE METAPHORS</text>
+  </g>
+</svg>

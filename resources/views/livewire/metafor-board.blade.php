@@ -4,7 +4,8 @@
 
     <div class="app-frame">
         <header class="hero-card panel">
-            <div>
+            <div class="hero-content">
+                <img class="hero-logo" src="{{ asset('images/metafors-logo.svg') }}" alt="Metafors logo">
                 <p class="eyebrow">Shared language for hard software ideas</p>
                 <h1>Collect metaphors that make systems easier to explain.</h1>
                 <p class="hero-copy">

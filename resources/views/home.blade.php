@@ -8,6 +8,8 @@
             name="description"
             content="A public collection of software metaphors with live filtering and a build-free Laravel frontend."
         >
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+        <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=fraunces:600,700|space-grotesk:400,500,700" rel="stylesheet">
         <link rel="stylesheet" href="{{ asset('css/metafors.css') }}">
