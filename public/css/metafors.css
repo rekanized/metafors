@@ -226,6 +226,15 @@ textarea {
     font-size: clamp(1.6rem, 2vw, 2.2rem);
 }
 
+.composer-heading {
+    display: grid;
+    gap: 10px;
+}
+
+.composer-copy {
+    max-width: none;
+}
+
 .panel-copy {
     max-width: 26ch;
     margin: 0;

@@ -32,12 +32,12 @@
 
         <div class="workspace-grid">
             <aside class="panel composer-panel">
-                <div class="panel-heading">
+                <div class="panel-heading composer-heading">
                     <div>
                         <p class="eyebrow">Add a new entry</p>
                         <h2>Make the glossary smarter</h2>
                     </div>
-                    <p class="panel-copy">The form is open to everyone. Exact duplicates are blocked and public posting is rate-limited.</p>
+                    <p class="panel-copy composer-copy">The form is open to everyone. Exact duplicates are blocked and public posting is rate-limited.</p>
                 </div>
 
                 @if (session('status'))
