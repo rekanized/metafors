@@ -166,15 +166,37 @@
 
                                 <div class="results-grid">
                                     @foreach ($entries as $entry)
-                                        <article class="metafor-card panel" wire:key="metafor-{{ $entry->id }}">
+                                        <article class="metafor-card panel {{ $moderationUnlocked ? 'is-moderation' : 'has-floating-rating' }}" wire:key="metafor-{{ $entry->id }}">
                                             <header class="card-head">
-                                                <div>
+                                                <div class="card-meta">
                                                     <p class="card-kicker">{{ $entry->explained_for }}</p>
-                                                    <p class="rating-summary">
-                                                        <strong>{{ number_format((float) ($entry->ratings_avg_rating ?? 0), 1) }}</strong>
-                                                        / 5 from {{ $entry->ratings_count }} {{ \Illuminate\Support\Str::plural('rating', $entry->ratings_count) }}
-                                                    </p>
+
+                                                    @if ($moderationUnlocked)
+                                                        <div class="rating-summary" aria-label="Average rating">
+                                                            <span class="rating-summary-label">Rating</span>
+                                                            <p class="rating-summary-value">
+                                                                <strong>{{ number_format((float) ($entry->ratings_avg_rating ?? 0), 1) }}</strong>
+                                                                <span>/ 5</span>
+                                                            </p>
+                                                            <p class="rating-summary-count">
+                                                                {{ $entry->ratings_count }} {{ \Illuminate\Support\Str::plural('rating', $entry->ratings_count) }}
+                                                            </p>
+                                                        </div>
+                                                    @endif
                                                 </div>
+
+                                                @if (! $moderationUnlocked)
+                                                    <div class="rating-summary rating-summary-floating" aria-label="Average rating">
+                                                        <span class="rating-summary-label">Rating</span>
+                                                        <p class="rating-summary-value">
+                                                            <strong>{{ number_format((float) ($entry->ratings_avg_rating ?? 0), 1) }}</strong>
+                                                            <span>/ 5</span>
+                                                        </p>
+                                                        <p class="rating-summary-count">
+                                                            {{ $entry->ratings_count }} {{ \Illuminate\Support\Str::plural('rating', $entry->ratings_count) }}
+                                                        </p>
+                                                    </div>
+                                                @endif
 
                                                 @if ($moderationUnlocked)
                                                     <div class="card-actions">
@@ -220,7 +242,10 @@
                                                 <blockquote>{!! nl2br(e($entry->metafor)) !!}</blockquote>
 
                                                 <div class="rating-strip">
-                                                    <span>Rate this metaphor</span>
+                                                    <div class="rating-strip-copy">
+                                                        <span class="rating-strip-label">Rate this metaphor</span>
+                                                        <p class="rating-strip-hint">Pick a score from 1 to 5.</p>
+                                                    </div>
 
                                                     <div class="rating-actions">
                                                         @for ($rating = 1; $rating <= 5; $rating++)
@@ -241,8 +266,6 @@
                                                         <span>Delete is armed. Click again to remove it.</span>
                                                     @elseif ($moderationUnlocked)
                                                         <span>Moderation is unlocked for this session.</span>
-                                                    @else
-                                                        <span>Exact duplicates are blocked and ratings drive the ordering inside each solution group.</span>
                                                     @endif
                                                 </footer>
                                             @endif
