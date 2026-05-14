@@ -11,6 +11,17 @@ use Illuminate\Support\Str;
 #[Fillable(['metafor', 'explained_for'])]
 class Metafor extends Model
 {
+    protected static function booted(): void
+    {
+        static::saving(function (Metafor $metafor): void {
+            if (! is_string($metafor->metafor) || ! is_string($metafor->explained_for)) {
+                return;
+            }
+
+            $metafor->signature = static::signature($metafor->metafor, $metafor->explained_for);
+        });
+    }
+
     public function ratings(): HasMany
     {
         return $this->hasMany(MetaforRating::class);

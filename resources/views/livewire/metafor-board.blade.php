@@ -134,7 +134,7 @@
                     <div class="filter-group">
                         <button
                             type="button"
-                            wire:click="$set('explainedForFilter', '')"
+                            wire:click="filterByExplainedFor('')"
                             class="filter-chip {{ $explainedForFilter === '' ? 'is-active' : '' }}"
                         >
                             All solutions
@@ -143,7 +143,7 @@
                         @foreach ($groups as $group)
                             <button
                                 type="button"
-                                wire:click="$set('explainedForFilter', '{{ addslashes($group) }}')"
+                                wire:click="filterByEncodedExplainedFor('{{ base64_encode($group) }}')"
                                 class="filter-chip {{ $explainedForFilter === $group ? 'is-active' : '' }}"
                             >
                                 {{ $group }}

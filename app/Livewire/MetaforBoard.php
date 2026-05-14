@@ -5,6 +5,8 @@ namespace App\Livewire;
 use App\Models\Metafor;
 use App\Models\MetaforRating;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\QueryException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\RateLimiter;
@@ -117,7 +119,17 @@ class MetaforBoard extends Component
             return;
         }
 
-        Metafor::query()->create($validated);
+        try {
+            Metafor::query()->create($validated);
+        } catch (QueryException $exception) {
+            if (! $this->isDuplicateConstraintViolation($exception)) {
+                throw $exception;
+            }
+
+            $this->addError('metafor', 'This metaphor already exists for that software solution.');
+
+            return;
+        }
 
         RateLimiter::hit(static::limiterKey(), self::SUBMISSION_DECAY_SECONDS);
 
@@ -174,7 +186,17 @@ class MetaforBoard extends Component
             return;
         }
 
-        Metafor::query()->findOrFail($this->editingId)->update($payload);
+        try {
+            Metafor::query()->findOrFail($this->editingId)->update($payload);
+        } catch (QueryException $exception) {
+            if (! $this->isDuplicateConstraintViolation($exception)) {
+                throw $exception;
+            }
+
+            $this->addError('editMetafor', 'This metaphor already exists for that software solution.');
+
+            return;
+        }
 
         if ($this->explainedForFilter !== '' && $this->explainedForFilter !== $payload['explained_for']) {
             $this->explainedForFilter = '';
@@ -217,6 +239,27 @@ class MetaforBoard extends Component
     {
         $this->reset('search', 'explainedForFilter');
         $this->resetPage();
+    }
+
+    public function filterByExplainedFor(string $group): void
+    {
+        if ($this->explainedForFilter === $group) {
+            return;
+        }
+
+        $this->explainedForFilter = $group;
+        $this->resetPage();
+    }
+
+    public function filterByEncodedExplainedFor(string $encodedGroup): void
+    {
+        $group = base64_decode($encodedGroup, true);
+
+        if (! is_string($group)) {
+            return;
+        }
+
+        $this->filterByExplainedFor($group);
     }
 
     public function rateMetafor(int $metaforId, int $rating): void
@@ -275,8 +318,8 @@ class MetaforBoard extends Component
 
         return Metafor::query()
             ->when($ignoreId !== null, fn ($query) => $query->whereKeyNot($ignoreId))
-            ->get(['metafor', 'explained_for'])
-            ->contains(fn (Metafor $entry): bool => Metafor::signature($entry->metafor, $entry->explained_for) === $signature);
+            ->where('signature', $signature)
+            ->exists();
     }
 
     /**
@@ -313,6 +356,34 @@ class MetaforBoard extends Component
         ]);
     }
 
+    protected function metaforsQuery(): Builder
+    {
+        return Metafor::query()
+            ->withAvg('ratings', 'rating')
+            ->withCount('ratings')
+            ->when(
+                $this->explainedForFilter !== '',
+                fn ($query) => $query->where('explained_for', $this->explainedForFilter),
+            )
+            ->when(
+                trim($this->search) !== '',
+                fn ($query) => $query->search($this->search),
+            )
+            ->when(
+                $this->explainedForFilter === '',
+                fn ($query) => $query->orderBy('explained_for'),
+            )
+            ->orderByDesc('ratings_avg_rating')
+            ->orderByDesc('ratings_count')
+            ->latest()
+            ->orderByDesc('id');
+    }
+
+    protected function isDuplicateConstraintViolation(QueryException $exception): bool
+    {
+        return in_array((string) $exception->getCode(), ['19', '23000', '23505'], true);
+    }
+
     public function render(): View
     {
         if (! Schema::hasTable('metafors') || ! Schema::hasTable('metafor_ratings')) {
@@ -336,26 +407,13 @@ class MetaforBoard extends Component
             ->orderBy('explained_for')
             ->pluck('explained_for');
 
-        $metafors = Metafor::query()
-            ->withAvg('ratings', 'rating')
-            ->withCount('ratings')
-            ->when(
-                $this->explainedForFilter !== '',
-                fn ($query) => $query->where('explained_for', $this->explainedForFilter),
-            )
-            ->when(
-                trim($this->search) !== '',
-                fn ($query) => $query->search($this->search),
-            )
-            ->when(
-                $this->explainedForFilter === '',
-                fn ($query) => $query->orderBy('explained_for'),
-            )
-            ->orderByDesc('ratings_avg_rating')
-            ->orderByDesc('ratings_count')
-            ->latest()
-            ->orderByDesc('id')
-            ->paginate($this->perPage);
+        $metafors = $this->metaforsQuery()->paginate($this->perPage);
+
+        if ($metafors->total() > 0 && $metafors->currentPage() > $metafors->lastPage()) {
+            $this->setPage($metafors->lastPage());
+
+            $metafors = $this->metaforsQuery()->paginate($this->perPage);
+        }
 
         $currentRatings = MetaforRating::query()
             ->where('rater_token', $this->raterToken())

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Livewire\MetaforBoard;
 use App\Models\Metafor;
 use App\Models\MetaforRating;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Livewire;
@@ -160,6 +161,23 @@ class MetaforBoardTest extends TestCase
         $this->assertDatabaseCount('metafors', 1);
     }
 
+    public function test_database_enforces_normalized_duplicate_signatures(): void
+    {
+        config()->set('services.metafors.moderation_key', 'test-moderation-key');
+
+        Metafor::query()->create([
+            'metafor' => 'A queue is an airport departure board for work.',
+            'explained_for' => 'Queues',
+        ]);
+
+        $this->expectException(QueryException::class);
+
+        Metafor::query()->create([
+            'metafor' => '  A queue is an airport departure board for work.  ',
+            'explained_for' => '  queues ',
+        ]);
+    }
+
     public function test_public_submissions_are_rate_limited(): void
     {
         config()->set('services.metafors.moderation_key', 'test-moderation-key');
@@ -246,5 +264,60 @@ class MetaforBoardTest extends TestCase
             ->call('nextPage')
             ->assertSee('Page 2 of 2')
             ->assertSee('A queue metaphor [1]');
+    }
+
+    public function test_filtering_from_a_later_page_resets_back_to_the_first_page(): void
+    {
+        config()->set('services.metafors.moderation_key', 'test-moderation-key');
+
+        foreach (range(1, 13) as $number) {
+            Metafor::query()->create([
+                'metafor' => "A queue metaphor [{$number}]",
+                'explained_for' => 'Queues',
+            ]);
+        }
+
+        Metafor::query()->create([
+            'metafor' => 'A cache is a pantry for nearby requests.',
+            'explained_for' => 'Caching',
+        ]);
+
+        Livewire::test(MetaforBoard::class)
+            ->call('nextPage')
+            ->assertSee('Page 2 of 2')
+            ->call('filterByExplainedFor', 'Caching')
+            ->assertSee('A cache is a pantry for nearby requests.')
+            ->assertDontSee('Page 2 of 2');
+    }
+
+    public function test_out_of_range_pages_are_clamped_to_the_last_available_page(): void
+    {
+        config()->set('services.metafors.moderation_key', 'test-moderation-key');
+
+        foreach (range(1, 13) as $number) {
+            Metafor::query()->create([
+                'metafor' => "A queue metaphor [{$number}]",
+                'explained_for' => 'Queues',
+            ]);
+        }
+
+        Livewire::withQueryParams(['page' => 99])
+            ->test(MetaforBoard::class)
+            ->assertSee('Page 2 of 2')
+            ->assertSee('A queue metaphor [1]');
+    }
+
+    public function test_filter_chips_render_with_safe_encoded_actions(): void
+    {
+        config()->set('services.metafors.moderation_key', 'test-moderation-key');
+
+        Metafor::query()->create([
+            'metafor' => 'Identity checks happen once, then the whole club trusts the stamp.',
+            'explained_for' => 'IDP; Identity and Service providers.',
+        ]);
+
+        Livewire::test(MetaforBoard::class)
+            ->assertSeeHtml("wire:click=\"filterByEncodedExplainedFor('SURQOyBJZGVudGl0eSBhbmQgU2VydmljZSBwcm92aWRlcnMu')\"")
+            ->assertDontSeeHtml("wire:click=\"filterByExplainedFor(\"");
     }
 }
